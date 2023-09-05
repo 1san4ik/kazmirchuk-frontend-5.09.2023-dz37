@@ -8,6 +8,9 @@ import {
 const navLinks = document.querySelectorAll('.nav-link')
 const colCenter = document.querySelector('.colCenter')
 const colRight = document.querySelector('.colRight')
+const buttonOrders = document.querySelector('.buttonOrders')
+buttonOrders.addEventListener('click', displayOrders)
+const orders = {}
 
 navLinks.forEach((link, index) => {
   link.textContent = listCategory[index]
@@ -18,6 +21,8 @@ navLinks.forEach((link, index) => {
 
   link.addEventListener('click', (event) => {
     event.preventDefault()
+
+    buttonOrders.classList.remove('active')
 
     navLinks.forEach((link) => {
       link.classList.remove('active')
@@ -353,6 +358,7 @@ function payList() {
   const buyerImgProduct = localStorage.getItem('imgSrc')
   const productQuantity = localStorage.getItem('quantity')
   const productOplata = localStorage.getItem('oplata')
+  const priceProduct = localStorage.getItem('priceProduct')
 
   const payListContent = document.createElement('div')
   payListContent.classList.add('payListContent')
@@ -362,10 +368,8 @@ function payList() {
   payListTitle.classList.add('payListTitle')
   payListTitle.innerHTML = `Ви замовили: <h2>${buyerProductName}</h2><br>
 <div><img src="${buyerImgProduct}"></div><br>
-<div>Вартість: ${productQuantity}шт. * ${localStorage.getItem(
-    'priceProduct'
-  )}&#8372;  =  <b>${
-    productQuantity * localStorage.getItem('priceProduct')
+<div>Вартість: ${productQuantity}шт. * ${priceProduct} &#8372;  =  <b>${
+    productQuantity * priceProduct
   }</b>&#8372;</div>`
   payListContent.appendChild(payListTitle)
 
@@ -384,5 +388,101 @@ function payList() {
     localStorage.removeItem('oplata')
     localStorage.removeItem('quantity')
     localStorage.removeItem('comment')
+
+    function Order(
+      buyerProductName,
+      buyerImgProduct,
+      productQuantity,
+      productOplata,
+      priceProduct
+    ) {
+      this.buyerProductName = buyerProductName
+      this.buyerImgProduct = buyerImgProduct
+      this.productQuantity = productQuantity
+      this.productOplata = productOplata
+      this.priceProduct = priceProduct
+    }
+
+    function createNumberOrder(orders) {
+      return Object.keys(orders).length + 1
+    }
+
+    function addOrder(order) {
+      let orders = JSON.parse(localStorage.getItem('Orders')) || {}
+      const numberOrder = createNumberOrder(orders)
+      orders[numberOrder] = order
+      localStorage.setItem('Orders', JSON.stringify(orders))
+    }
+
+    const storedOrders = JSON.parse(localStorage.getItem('Orders'))
+    if (storedOrders) {
+      Object.assign(orders, storedOrders)
+    }
+
+    const order1 = new Order(
+      buyerProductName,
+      buyerImgProduct,
+      productQuantity,
+      productOplata,
+      priceProduct
+    )
+    order1.orderDate = new Date().toLocaleString()
+    addOrder(order1)
   })
+}
+
+function displayOrders() {
+  colCenter.innerHTML = ''
+  navLinks.forEach((link) => {
+    link.classList.remove('active')
+  })
+  buttonOrders.classList.add('active')
+
+  const storedOrders = JSON.parse(localStorage.getItem('Orders'))
+
+  if (!storedOrders) {
+    const noOrdersMessage = document.createElement('p')
+    noOrdersMessage.innerText = 'Замовлень немає.'
+    colCenter.appendChild(noOrdersMessage)
+    return
+  }
+
+  const orderNumbers = Object.keys(storedOrders)
+
+  if (orderNumbers.length === 0) {
+    const noOrdersMessage = document.createElement('p')
+    noOrdersMessage.innerText = 'Замовлень немає.'
+    colCenter.appendChild(noOrdersMessage)
+    return
+  }
+
+  for (const orderNumber of orderNumbers) {
+    const order = storedOrders[orderNumber]
+    const orderDiv = document.createElement('div')
+    orderDiv.classList.add('orderDiv')
+    orderDiv.innerHTML = `
+      <h3>Замовлення №${orderNumber}</h3>
+      <h4>${order.buyerProductName}</h4>
+      <img src="${order.buyerImgProduct}">
+      <p>Кількість: ${order.productQuantity}</p>
+      <p>Загальна ціна: ${
+        order.priceProduct * order.productQuantity
+      } &#8372;</p>
+      <p>Оплата: ${order.productOplata}</p>
+      <p>Дата та час замовлення: ${order.orderDate}</p>
+      <button class="delete-button" data-order-number="${orderNumber}">Видалити</button>
+    `
+    colCenter.appendChild(orderDiv)
+
+    const deleteButton = orderDiv.querySelector('.delete-button')
+    deleteButton.addEventListener('click', (event) => {
+      const orderNumberToDelete = event.target.getAttribute('data-order-number')
+
+      const storedOrders = JSON.parse(localStorage.getItem('Orders'))
+      delete storedOrders[orderNumberToDelete]
+
+      localStorage.setItem('Orders', JSON.stringify(storedOrders))
+      displayOrders()
+    })
+  }
 }
