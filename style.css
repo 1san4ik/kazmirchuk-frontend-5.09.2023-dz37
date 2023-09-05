@@ -31,6 +31,7 @@ body {
 }
 .colCenter {
   display: flex;
+  align-self: flex-start;
   flex-wrap: wrap;
   margin: 10px 5px 5px 5px;
 }
@@ -67,7 +68,7 @@ body {
 
 .border {
   width: 220px;
-  margin: 2px 5px;
+  /* margin: 2px 5px; */
   margin: 5px auto;
   background: white;
   padding: 20px;
@@ -347,4 +348,54 @@ select {
 
 .payListTitle img {
   width: 20%;
+}
+/*============================orders List=================*/
+.orderDiv {
+  background-color: white;
+  border: 1px solid black;
+  margin: 5px auto;
+  padding: 20px;
+  border: 1px solid #f1e7e8;
+  width: 200px;
+  min-height: 420px;
+}
+.orderDiv img {
+  display: block;
+  max-width: 100px;
+  max-height: 100px;
+  margin-left: 40px;
+}
+
+.delete-button {
+  display: block;
+  padding: 5px 10px;
+  margin: 30px auto 5px;
+  font-size: 14px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+.delete-button:active {
+  background-color: #216a94;
+}
+
+.buttonOrders {
+  margin-top: 50px;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.active {
+  color: #ffffff;
+  background-color: #3498db;
+  border-radius: 2px;
 }
